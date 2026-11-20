@@ -61,10 +61,11 @@ const guides = [
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-const state = { guideId: 'quick', step: 0, collapsed: false, mobileView: 'guides', toastTimer: null };
+const state = { guideId: 'quick', step: 0, collapsed: false, mobileView: 'guides', toastTimer: null, commandHistory: [] };
 const saved = (() => { try { return JSON.parse(localStorage.getItem('clawguide-state') || '{}'); } catch { return {}; } })();
 const guideFor = (id = state.guideId) => guides.find(guide => guide.id === id) || guides[0];
 const escapeHtml = value => String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
+const consoleCommands = new Set(['help', 'status', 'guides', 'ls', 'open', 'search', 'progress', 'theme', 'hint', 'history', 'clear', 'whoami', 'date', 'data', 'sysinfo']);
 
 function saveState() {
   try { localStorage.setItem('clawguide-state', JSON.stringify({ guideId: state.guideId, step: state.step, theme: document.body.dataset.theme || 'moss', seen: state.seen || {} })); } catch { /* private browsing may block storage */ }
@@ -150,7 +151,7 @@ function showModal(id) {
     repository: ['Check the source before install', 'Confirm the exact project name, repository owner, release history, documentation domain, install steps, required permissions, and how updates are signed or published. If the instructions ask you to paste a token into a public chat or run an opaque root script, stop and investigate.'],
     principle: ['Understand first. Automate second.', 'A command on a remote server can change real systems. This field guide shows examples and explains their intent, but it never sends commands to your VPS. Confirm the target, permissions, and rollback plan before running anything.'],
     help: ['A small field guide, not a remote console', 'Choose a topic, move through the steps, and copy a command only after you have reviewed it. Use the official links for current provider or software instructions. The built-in hints are scripted examples, not a live AI assistant.'],
-    automation: ['Quick actions', 'Try the SSH safety checklist, open Script Lab for safe templates, or explore the webhook integration guide. Keep every automation narrow, observable, and easy to switch off.']
+    automation: ['Quick actions', 'Try help, status, open ssh, search webhook, progress, history, or theme blade. These allowlisted commands only control this guide UI; no REST API, live VPS telemetry, or remote shell is connected.']
   }[id] || ['Field note', 'Explore the guide and use placeholders for private details.'];
   $('#modal-kicker').textContent = id === 'help' ? 'HOW TO USE THIS' : 'FIELD NOTE / SAFETY';
   $('#modal-title').textContent = content[0];
@@ -167,12 +168,90 @@ async function copyText(text) {
     const ok = document.execCommand('copy'); area.remove(); toast(ok ? 'Copied to clipboard — review before running.' : 'Could not copy. Select the command manually.');
   }
 }
-function replyToQuestion() {
-  const input = $('#question-input');
-  const question = input.value.trim();
-  if (!question) { toast('Type a topic to get a built-in hint.'); return; }
-  $('#messages').insertAdjacentHTML('beforeend', messageMarkup({ text: question, user: true }));
-  input.value = '';
+function appendConsoleReply(command, text, actions = []) {
+  $('#messages').insertAdjacentHTML('beforeend', messageMarkup({ text: command, user: true }));
+  $('#messages').insertAdjacentHTML('beforeend', messageMarkup({ text, who: 'Guide', actions, time: 'just now' }));
+  $('#chat-scroll').scrollTop = $('#chat-scroll').scrollHeight;
+}
+function guideMatches(query) {
+  const needle = query.trim().toLowerCase();
+  if (!needle) return [];
+  return guides.filter(guide => [guide.id, guide.short, guide.room, ...guide.steps.map(step => `${step.title} ${step.text}`)].join(' ').toLowerCase().includes(needle));
+}
+function findGuide(query) {
+  const needle = query.trim().toLowerCase();
+  if (!needle) return null;
+  const aliases = { start: 'quick', quick: 'quick', 'quick start': 'quick', ssh: 'secure', security: 'secure', secure: 'secure', bot: 'bot', clawbot: 'bot', script: 'scripts', scripts: 'scripts', automation: 'scripts', webhook: 'webhooks', webhooks: 'webhooks', idea: 'ideas', ideas: 'ideas', next: 'ideas' };
+  if (aliases[needle]) return guides.find(guide => guide.id === aliases[needle]);
+  return guides.find(guide => [guide.id, guide.short, guide.room].some(value => value.toLowerCase() === needle)) || guideMatches(needle)[0] || null;
+}
+function applyTheme(theme, announce = true) {
+  if (!['moss', 'violet', 'paper'].includes(theme)) return false;
+  document.body.dataset.theme = theme;
+  $$('.theme-choice').forEach(button => button.classList.toggle('is-active', button.dataset.theme === theme));
+  saveState();
+  if (announce) toast(`${theme === 'moss' ? 'Blade' : `${theme[0].toUpperCase()}${theme.slice(1)}`} theme applied.`);
+  return true;
+}
+function runConsoleCommand(command, args, raw) {
+  const query = args.join(' ').trim();
+  const guide = guideFor();
+  const percent = Math.round(state.step / guide.steps.length * 100);
+  if (command === 'clear') { renderCurrentGuide(true); toast('Console transcript cleared. Guide progress is kept.'); return; }
+  if (command === 'open') {
+    const target = findGuide(query);
+    if (!target) { appendConsoleReply(raw, query ? 'No matching guide. Try open ssh, open clawbot, open scripts, or open webhooks.' : 'Usage: open <guide topic>. Try open ssh or open clawbot.'); return; }
+    selectGuide(target.id);
+    toast(`Opened ${target.short}.`);
+    return;
+  }
+  if (command === 'theme') {
+    const themes = { blade: 'moss', moss: 'moss', violet: 'violet', paper: 'paper' };
+    const selected = themes[query.toLowerCase()];
+    if (!selected) { appendConsoleReply(raw, 'Usage: theme blade, theme violet, or theme paper.'); return; }
+    applyTheme(selected, false);
+    appendConsoleReply(raw, `${selected === 'moss' ? 'Blade' : `${selected[0].toUpperCase()}${selected.slice(1)}`} display profile applied. Theme preference is saved on this device.`);
+    return;
+  }
+  if (command === 'hint') {
+    if (!query) { appendConsoleReply(raw, 'Usage: hint <topic>. Try hint ssh, hint Termux, hint Clawbot, or hint webhook.'); return; }
+    replyWithHint(query, raw);
+    return;
+  }
+  if (command === 'search') {
+    const matches = guideMatches(query);
+    if (!matches.length) { appendConsoleReply(raw, query ? `No local guide text matched “${query}”. Try search ssh or search telegram.` : 'Usage: search <topic>. This searches the guide text on this page only.'); return; }
+    appendConsoleReply(raw, `Local guide search · ${matches.length} match${matches.length === 1 ? '' : 'es'}\n${matches.map(item => `• ${item.short}`).join('\n')}`, matches.map(item => ({ label: `Open ${item.short}`, guide: item.id, step: 0 })));
+    return;
+  }
+  if (command === 'help') {
+    appendConsoleReply(raw, 'SAFE LOCAL COMMANDS\nhelp · show this list\nstatus · show demo connection state\nguides / ls · list field guides\nopen <topic> · open a guide\nsearch <term> · search local guide text\nprogress · show current guide position\ntheme <blade|violet|paper> · change display\nhint <topic> · get a scripted hint\nhistory · show recent in-memory input\nclear · reset the visible guide transcript\nwhoami · show demo profile · date · local time\ndata / sysinfo · connection status only\nNo command is sent to a shell or server.');
+    return;
+  }
+  if (command === 'status') {
+    appendConsoleReply(raw, `FIELD CONSOLE · READY\nMode: browser-only demo\nGuide: ${guide.short}\nPosition: ${state.step + 1} of ${guide.steps.length}\nProgress: ${percent}%\nVPS link: NOT CONNECTED\nREST API: NOT CONFIGURED`);
+    return;
+  }
+  if (command === 'guides' || command === 'ls') {
+    appendConsoleReply(raw, `FIELD MANUAL · ${guides.length} guides\n${guides.map(item => `• ${item.short}`).join('\n')}`, guides.map(item => ({ label: `Open ${item.short}`, guide: item.id, step: 0 })));
+    return;
+  }
+  if (command === 'progress') {
+    appendConsoleReply(raw, `${guide.short} · position ${state.step + 1} of ${guide.steps.length} · ${percent}% visited. Progress is stored in this browser.`);
+    return;
+  }
+  if (command === 'history') {
+    const recent = state.commandHistory.slice(-10);
+    appendConsoleReply(raw, `RECENT INPUT · memory only\n${recent.map((item, index) => `${String(index + 1).padStart(2, '0')}  ${item}`).join('\n')}\nHistory is not written to storage.`);
+    return;
+  }
+  if (command === 'whoami') { appendConsoleReply(raw, 'Curious operator · browser-only tutorial demo · no account session is connected.'); return; }
+  if (command === 'date') { appendConsoleReply(raw, `Device-local time: ${new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date())}`); return; }
+  if (command === 'data') { appendConsoleReply(raw, 'No REST API is configured in this static project. No network request was made.'); return; }
+  if (command === 'sysinfo') { appendConsoleReply(raw, 'Live CPU, memory, and VPS telemetry are unavailable. This page does not inspect your device or server.'); }
+}
+function replyWithHint(question, displayedQuestion = question) {
+  $('#messages').insertAdjacentHTML('beforeend', messageMarkup({ text: displayedQuestion, user: true }));
   const typing = $('#typing-indicator');
   typing.hidden = false;
   $('#chat-scroll').scrollTop = $('#chat-scroll').scrollHeight;
@@ -192,12 +271,26 @@ function replyToQuestion() {
     $('#chat-scroll').scrollTop = $('#chat-scroll').scrollHeight;
   }, 500);
 }
+function replyToQuestion() {
+  const input = $('#question-input');
+  const raw = input.value.trim();
+  if (!raw) { toast('Type help, open ssh, or a topic for a built-in hint.'); return; }
+  state.commandHistory.push(raw);
+  if (state.commandHistory.length > 40) state.commandHistory.shift();
+  input.value = '';
+  const cleaned = raw.replace(/^\s*[$>]\s*/, '').trim();
+  const [word = '', ...args] = cleaned.split(/\s+/);
+  const command = word.toLowerCase().replace(/^\//, '');
+  if (consoleCommands.has(command)) { runConsoleCommand(command, args, raw); return; }
+  replyWithHint(raw);
+}
 function showMobileView(view) {
   state.mobileView = view;
   const shell = $('.app-shell');
   shell.classList.toggle('inspector-mode', view === 'progress' || view === 'themes');
   if (view === 'themes') $('.theme-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
   if (view === 'progress') $('.progress-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (view === 'guides' && window.innerWidth <= 700) $('#guide-switcher').scrollIntoView({ behavior: 'smooth', block: 'center' });
   $$('.mobile-nav-item').forEach(button => button.classList.toggle('is-active', button.dataset.mobileView === view));
 }
 
@@ -229,6 +322,12 @@ document.addEventListener('click', event => {
 });
 $('#send-question').addEventListener('click', replyToQuestion);
 $('#question-input').addEventListener('keydown', event => { if (event.key === 'Enter') replyToQuestion(); });
+$('#launch-console').addEventListener('click', () => {
+  showMobileView('chat');
+  const input = $('#question-input');
+  input.focus();
+  input.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
+});
 $('#reset-progress').addEventListener('click', () => { state.step = 0; state.seen[guideFor().id] = 0; renderCurrentGuide(); toast('Progress reset for this guide.'); });
 $('#toggle-steps').addEventListener('click', event => { state.collapsed = !state.collapsed; renderStepList(); event.currentTarget.textContent = state.collapsed ? '+' : '−'; });
 $('#open-help').addEventListener('click', () => showModal('help'));

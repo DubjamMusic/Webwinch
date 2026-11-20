@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#111411" />
-    <meta name="description" content="A chat-shaped field guide for setting up a Contabo VPS from Android, learning SSH, and exploring bot workflows." />
-    <title>ClawGuide — VPS field notes</title>
+    <meta name="theme-color" content="#101810" />
+    <meta name="description" content="A Winchester-inspired, mobile-first console for learning Contabo VPS setup, Android SSH, and safe Clawbot workflows." />
+    <title>ClawGuide — Winchester field console</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/styles.css" />
   </head>
@@ -14,68 +14,70 @@
       <aside class="sidebar" aria-label="Guide navigation">
         <a class="brand" href="#home" aria-label="ClawGuide home">
           <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
-          <span><strong>clawguide</strong><small>FIELD NOTES / 001</small></span>
+          <span><strong>clawguide</strong><small>WINCHESTER / FIELD CONSOLE</small></span>
         </a>
 
-        <div class="workspace-label"><span class="status-dot"></span> PERSONAL LAB <span class="workspace-chevron">⌄</span></div>
-        <div class="nav-caption">YOUR FIELD MANUAL</div>
+        <div class="workspace-label"><span class="status-dot"></span> LOCAL DEMO · SAFE MODE <span class="workspace-chevron">⌄</span></div>
+        <div class="nav-caption">SELECT A BLADE</div>
         <nav class="guide-nav" id="guide-nav" aria-label="Tutorials"></nav>
 
         <div class="sidebar-bottom">
           <div class="side-tip">
             <span class="tip-icon">✳</span>
-            <div><strong>One step at a time.</strong><p>Commands are suggestions. Read them before you run them.</p></div>
+            <div><strong>Read before you run.</strong><p>Every command is a template. This console never reaches your VPS.</p></div>
           </div>
-          <div class="profile-row"><span class="avatar avatar-you">Y</span><span><strong>Curious operator</strong><small>Learning mode</small></span><button class="icon-button" id="open-settings" aria-label="Open appearance settings" title="Appearance settings">•••</button></div>
+          <div class="profile-row"><span class="avatar avatar-you">Y</span><span><strong>Curious operator</strong><small>Browser-only session</small></span><button class="icon-button" id="open-settings" aria-label="Open appearance settings" title="Appearance settings">•••</button></div>
         </div>
       </aside>
 
       <main class="main-area" id="home">
         <header class="topbar">
-          <div class="breadcrumbs"><span>FIELD MANUAL</span><span class="crumb-slash">/</span><strong id="breadcrumb-title">Quick start</strong></div>
+          <div class="breadcrumbs"><span>WINCHESTER MODE</span><span class="crumb-slash">/</span><strong id="breadcrumb-title">Quick start</strong></div>
           <div class="topbar-actions">
-            <span class="secure-pill"><span class="status-dot"></span> PRIVATE WORKSPACE</span>
+            <span class="secure-pill"><span class="status-dot"></span> SAFE MODE · NO VPS LINK</span>
             <button class="icon-button help-button" id="open-help" aria-label="Open help" title="Help">?</button>
           </div>
         </header>
 
         <section class="welcome-strip">
-          <div>
-            <div class="eyebrow"><span class="eyebrow-line"></span> YOUR VPS, YOUR RULES</div>
-            <h1>Make the server<br class="mobile-break" /> feel <em>less mysterious.</em></h1>
-            <p>Small, clear steps for getting from your Android phone to a VPS you understand.</p>
+          <div class="welcome-copy">
+            <div class="eyebrow"><span class="eyebrow-line"></span> OPERATOR TRAINING · LOCAL SIM</div>
+            <h1>Your next move,<br class="mobile-break" /> <em>under control.</em></h1>
+            <p>VPS setup, Android SSH, and safe bot workflows—one readable step at a time.</p>
+            <button class="launch-console" id="launch-console" type="button">OPEN COMMAND DECK <span>↵</span></button>
           </div>
-          <div class="welcome-stats"><div class="stat-orbit"><span>01</span></div><div><strong>FIELD GUIDE</strong><small>Built for the small screen</small></div></div>
+          <div class="welcome-stats"><div class="stat-orbit"><span>OFF</span></div><div><strong>VPS LINK</strong><small>No live server attached</small></div></div>
         </section>
 
         <section class="chat-panel" aria-label="Tutorial group chat">
           <div class="chat-header">
             <div class="chat-room-icon"><span class="mini-claw">⌘</span></div>
-            <div class="chat-room-title"><strong id="room-title">VPS starters</strong><span><i class="online-dot"></i> a quiet corner of the internet <span class="chat-count">· 3 guides</span></span></div>
+              <div class="chat-room-title"><strong id="room-title">VPS starters</strong><span><i class="online-dot"></i> local guide session <span class="chat-count">· 6 field guides</span></span></div>
             <div class="chat-header-tools"><button class="chat-tool" id="internet-check" title="Check this browser's internet connection"><span class="signal-icon">⌁</span><span class="tool-label">Internet check</span></button><button class="icon-button" id="room-menu" aria-label="Room options">···</button></div>
           </div>
 
           <div class="guide-switcher" id="guide-switcher" aria-label="Choose a guide"></div>
 
           <div class="chat-scroll" id="chat-scroll" aria-live="polite">
-            <div class="date-divider"><span></span><small>YOUR SESSION STARTS HERE</small><span></span></div>
+            <div class="date-divider"><span></span><small>GUIDE SESSION · NO REMOTE SHELL</small><span></span></div>
             <div id="messages" class="messages"></div>
             <div class="typing-indicator" id="typing-indicator" hidden><span class="avatar avatar-bot">✳</span><span><b>ClawGuide</b><i><span></span><span></span><span></span></i></span></div>
           </div>
 
-          <div class="chat-composer">
-            <button class="composer-plus" id="composer-plus" aria-label="Show quick actions">＋</button>
-            <label class="composer-input-wrap"><span class="sr-only">Ask for a hint</span><input id="question-input" placeholder="Ask for a hint or type a topic…" autocomplete="off" /></label>
-            <button class="send-button" id="send-question" aria-label="Send question"><span>↗</span></button>
+          <div class="chat-composer console-composer">
+            <button class="composer-plus" id="composer-plus" aria-label="Show safe command help">?</button>
+            <label class="composer-input-wrap"><span class="sr-only">Enter a safe local command or ask for a guide hint</span><span class="console-prefix" aria-hidden="true">&gt;</span><input id="question-input" list="console-suggestions" placeholder="help · open ssh · hint webhook" autocomplete="off" spellcheck="false" /></label>
+            <datalist id="console-suggestions"><option value="help"><option value="status"><option value="guides"><option value="ls"><option value="progress"><option value="sysinfo"><option value="data"><option value="whoami"><option value="date"><option value="history"><option value="clear"><option value="open ssh"><option value="open clawbot"><option value="open scripts"><option value="open webhooks"><option value="search telegram"><option value="theme blade"><option value="theme violet"><option value="theme paper"><option value="hint webhook"></datalist>
+            <button class="send-button" id="send-question" aria-label="Run command or ask for a hint"><span>↵</span></button>
           </div>
-          <div class="composer-note">Guided hints are built in. No messages leave this page.</div>
+          <div class="composer-note"><span>LOCAL COMMAND DECK</span> · Fixed UI actions only · No VPS shell or live API</div>
         </section>
 
-        <section class="bottom-note"><span class="bottom-note-icon">⌁</span><p><strong>Good infra is understandable infra.</strong> You stay in control: nothing here runs a command on your VPS.</p><button class="text-button" id="show-principle">Why this matters <span>↗</span></button></section>
+        <section class="bottom-note"><span class="bottom-note-icon">⌁</span><p><strong>Good infra is understandable infra.</strong> This local console only changes the guide UI; nothing authenticates to or executes on your VPS.</p><button class="text-button" id="show-principle">Why this matters <span>↗</span></button></section>
       </main>
 
       <aside class="inspector" aria-label="Guide details">
-        <div class="inspector-top"><div class="eyebrow">YOUR PROGRESS</div><button class="icon-button" id="inspector-menu" aria-label="Progress options">···</button></div>
+        <div class="inspector-top"><div class="eyebrow">OPERATOR PROGRESS</div><button class="icon-button" id="inspector-menu" aria-label="Progress options">···</button></div>
         <div class="progress-card">
           <div class="progress-heading"><span class="progress-ring" id="progress-ring"><span id="progress-value">0%</span></span><div><strong id="progress-title">A fresh start</strong><small id="progress-caption">Pick up whenever you're ready.</small></div></div>
           <div class="progress-track"><span id="progress-bar"></span></div>
@@ -86,11 +88,11 @@
 
         <div class="inspector-section links-section"><div class="section-heading"><span>GOOD PLACES TO LOOK</span><span class="live-label">CURATED</span></div><a class="resource-link" href="https://contabo.com/en/" target="_blank" rel="noreferrer"><span class="resource-mark mark-contabo">C</span><span><strong>Contabo</strong><small>VPS dashboard & product docs</small></span><b>↗</b></a><a class="resource-link" href="https://termux.dev/en/" target="_blank" rel="noreferrer"><span class="resource-mark mark-termux">$_</span><span><strong>Termux</strong><small>Android terminal project</small></span><b>↗</b></a><a class="resource-link" href="https://man.openbsd.org/ssh" target="_blank" rel="noreferrer"><span class="resource-mark mark-ssh">⌁</span><span><strong>OpenSSH manual</strong><small>SSH command reference</small></span><b>↗</b></a></div>
 
-        <div class="inspector-section theme-section"><div class="section-heading"><span>MAKE IT YOURS</span><span class="theme-spark">✳</span></div><p class="theme-copy">Same field notes. A different atmosphere.</p><div class="theme-picker" role="group" aria-label="Choose a visual theme"><button class="theme-choice is-active" data-theme="moss" aria-label="Moss theme"><span class="swatch moss-swatch"></span><small>Moss</small></button><button class="theme-choice" data-theme="violet" aria-label="Violet theme"><span class="swatch violet-swatch"></span><small>Violet</small></button><button class="theme-choice" data-theme="paper" aria-label="Paper theme"><span class="swatch paper-swatch"></span><small>Paper</small></button></div></div>
+        <div class="inspector-section theme-section"><div class="section-heading"><span>DISPLAY PROFILE</span><span class="theme-spark">✳</span></div><p class="theme-copy">Same field manual. A different signal.</p><div class="theme-picker" role="group" aria-label="Choose a visual theme"><button class="theme-choice is-active" data-theme="moss" aria-label="Blade theme"><span class="swatch moss-swatch"></span><small>Blade</small></button><button class="theme-choice" data-theme="violet" aria-label="Violet theme"><span class="swatch violet-swatch"></span><small>Violet</small></button><button class="theme-choice" data-theme="paper" aria-label="Paper theme"><span class="swatch paper-swatch"></span><small>Paper</small></button></div></div>
       </aside>
     </div>
 
-    <nav class="mobile-nav" aria-label="Mobile navigation"><button class="mobile-nav-item is-active" data-mobile-view="guides"><span>▤</span><small>Guides</small></button><button class="mobile-nav-item" data-mobile-view="chat"><span>◉</span><small>Chat</small></button><button class="mobile-nav-item" data-mobile-view="progress"><span>◷</span><small>Progress</small></button><button class="mobile-nav-item" data-mobile-view="themes"><span>✳</span><small>Style</small></button></nav>
+    <nav class="mobile-nav" aria-label="Mobile navigation"><button class="mobile-nav-item is-active" data-mobile-view="guides"><span>▤</span><small>Guides</small></button><button class="mobile-nav-item" data-mobile-view="chat"><span>⌘</span><small>Console</small></button><button class="mobile-nav-item" data-mobile-view="progress"><span>◷</span><small>Progress</small></button><button class="mobile-nav-item" data-mobile-view="themes"><span>✳</span><small>Style</small></button></nav>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <dialog class="modal" id="info-modal"><div class="modal-card"><button class="modal-close" id="close-modal" aria-label="Close">×</button><div class="eyebrow" id="modal-kicker">FIELD NOTE</div><h2 id="modal-title">Keep the keys in your hands.</h2><p id="modal-copy"></p><button class="primary-button" id="modal-confirm">Got it <span>↗</span></button></div></dialog>
     <script src="/app.js" type="module"></script>
