@@ -7,3 +7,4 @@
 - [x] Customizable visual variations. Allow visual or content variations while retaining a consistent shared template structure.
 - [x] Expansion for automation, AI, and opportunity ideas. Include a place for future improvements around automation, AI use cases, monetization possibilities, and personal-development ideas without presenting earnings as guaranteed.
 - [x] Custom automation scripts and webhook integration guides. Add a dedicated section for custom Clawbot automation scripts and webhook integration, with examples, step-by-step guidance, and safety notes.
+- [x] Interactive Telegram bot command example. Add a Script Lab example showing a Telegram bot command, inline buttons, callback handling, safe action allowlisting, and token handling guidance.
