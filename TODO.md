@@ -6,3 +6,4 @@
 - [x] Reusable scripted guide templates. Include reusable structures for VPS/SSH and Clawbot-style guides so tutorial content can be extended without changing the overall interface.
 - [x] Customizable visual variations. Allow visual or content variations while retaining a consistent shared template structure.
 - [x] Expansion for automation, AI, and opportunity ideas. Include a place for future improvements around automation, AI use cases, monetization possibilities, and personal-development ideas without presenting earnings as guaranteed.
+- [x] Custom automation scripts and webhook integration guides. Add a dedicated section for custom Clawbot automation scripts and webhook integration, with examples, step-by-step guidance, and safety notes.
